@@ -1,131 +1,265 @@
 ﻿@{
     ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2 class="mb-3">Smart Business Dashboard</h2>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<div class="row text-center mb-4">
-    <div class="col-md-4">
-        <div class="card bg-light border-info shadow">
-            <div class="card-body">
-                <h5>Total Users</h5>
-                <h2 id="totalUsers">0</h2>
+<style>
+    body {
+        background-color: #f4f6f9;
+    }
+
+    .card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+    .summary-card {
+        color: white;
+    }
+
+    .bg-gradient-blue {
+        background: linear-gradient(135deg, #4361ee, #5f78f4);
+    }
+
+    .bg-gradient-green {
+        background: linear-gradient(135deg, #2f9e44, #43c360);
+    }
+
+    .bg-gradient-yellow {
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+    }
+
+    .bg-gradient-red {
+        background: linear-gradient(135deg, #ef4444, #f87171);
+    }
+
+    .chart-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+    }
+
+    .table th {
+        background-color: #343a40;
+        color: white;
+    }
+
+    .table td, .table th {
+        vertical-align: middle;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <h2 class="mb-4 fw-bold"><i class="bi bi-speedometer2 me-2"></i>Smart Business Dashboard</h2>
+
+    <!-- Summary Cards -->
+    <div class="row g-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="card bg-gradient-blue summary-card">
+                <div class="card-body">
+                    <h5><i class="bi bi-people me-1"></i> Total Users</h5>
+                    <h2 id="totalUsers">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="card bg-gradient-green summary-card">
+                <div class="card-body">
+                    <h5><i class="bi bi-box-seam me-1"></i> Total Products</h5>
+                    <h2 id="totalProducts">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="card bg-gradient-yellow summary-card">
+                <div class="card-body">
+                    <h5><i class="bi bi-stack me-1"></i> Total Stock</h5>
+                    <h2 id="totalStock">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="card bg-gradient-red summary-card">
+                <div class="card-body">
+                    <h5><i class="bi bi-cash-coin me-1"></i> Avg Price</h5>
+                    <h2 id="avgPrice">₹0</h2>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card bg-light border-primary shadow">
-            <div class="card-body">
-                <h5>Total Products</h5>
-                <h2 id="totalProducts">0</h2>
+    <!-- Charts -->
+    <div class="row mt-4">
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <h5>Products by Category (Bar Chart)</h5>
+                <canvas id="categoryChart" height="200"></canvas>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <h5>Price Distribution (Pie Chart)</h5>
+                <canvas id="pricePieChart" height="200"></canvas>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card bg-light border-success shadow">
-            <div class="card-body">
-                <h5>Total Stock</h5>
-                <h2 id="totalStock">0</h2>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="chart-container">
+                <h5>Stock Trend (Line Chart)</h5>
+                <canvas id="stockLineChart" height="100"></canvas>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card bg-light border-warning shadow">
-            <div class="card-body">
-                <h5>Average Price</h5>
-                <h2 id="avgPrice">₹0</h2>
+
+    <!-- Product Search -->
+    <div class="mt-4 mb-2">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search by Product Name or Category...">
+    </div>
+
+    <!-- Product Details Table -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-list-check me-2"></i> Product Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price (₹)</th>
+                            <th>Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody">
+                        <tr><td colspan="5" class="text-center text-muted">Loading...</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Bar Chart -->
-<canvas id="categoryChart" width="400" height="200"></canvas>
-<hr class="mt-4" />
+<script>
+    let allProducts = [];
 
-<h4 class="mt-3">Product Price Distribution (Pie)</h4>
-<canvas id="pricePieChart" width="400" height="200"></canvas>
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('/Dashboard/GetDashboardStats')
+            .then(response => response.json())
+            .then(data => {
+                allProducts = data.allProducts;
 
-<h4 class="mt-4">Stock Over Time (Line Chart)</h4>
-<canvas id="stockLineChart" width="400" height="200"></canvas>
+                renderProductTable(allProducts);
+                renderCharts(data);
 
-@section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        $(document).ready(function () {
-            $.get("/Dashboard/GetDashboardStats", function (data) {
-                // 🧾 Update Summary Cards
-                $('#totalProducts').text(data.totalProducts);
-                $('#totalStock').text(data.totalStock);
-                $('#avgPrice').text("₹" + data.avgPrice.toFixed(2));
-                $('#totalUsers').text(data.totalUsers);
-
-                // 📊 Bar Chart: Products by Category
-                const catLabels = data.byCategory.map(c => c.category);
-                const catCounts = data.byCategory.map(c => c.count);
-
-                new Chart(document.getElementById('categoryChart'), {
-                    type: 'bar',
-                    data: {
-                        labels: catLabels,
-                        datasets: [{
-                            label: 'Products by Category',
-                            data: catCounts,
-                            backgroundColor: '#007bff',
-                            borderColor: '#0056b3',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: { beginAtZero: true }
-                        }
-                    }
-                });
-
-                // 🥧 Pie Chart: Price Distribution by Category
-                const pieData = data.byCategory.map(c => {
-                    const category = c.category;
-                    const productsInCat = data.allProducts
-                        .filter(p => (p.category ?? 'Uncategorized') === category);
-                    const totalPrice = productsInCat.reduce((sum, p) => sum + p.price, 0);
-                    return { label: category, total: totalPrice };
-                });
-
-                new Chart(document.getElementById('pricePieChart'), {
-                    type: 'pie',
-                    data: {
-                        labels: pieData.map(p => p.label),
-                        datasets: [{
-                            data: pieData.map(p => p.total.toFixed(2)),
-                            backgroundColor: ['#f44336', '#2196f3', '#ffc107', '#4caf50', '#9c27b0']
-                        }]
-                    }
-                });
-
-                // 📈 Line Chart: Stock Over Time (Dummy)
-                const stockTrend = {
-                    labels: ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5"],
-                    data: [50, 80, 70, 100, 90]
-                };
-
-                new Chart(document.getElementById('stockLineChart'), {
-                    type: 'line',
-                    data: {
-                        labels: stockTrend.labels,
-                        datasets: [{
-                            label: "Stock Trend",
-                            data: stockTrend.data,
-                            fill: false,
-                            borderColor: '#28a745',
-                            tension: 0.3
-                        }]
-                    }
-                });
+                // Cards
+                document.getElementById('totalProducts').textContent = data.totalProducts;
+                document.getElementById('totalStock').textContent = data.totalStock;
+                document.getElementById('avgPrice').textContent = "₹" + data.avgPrice;
+                document.getElementById('totalUsers').textContent = data.totalUsers;
             });
-        });
-    </script>
-}
 
+        document.getElementById('searchInput').addEventListener('input', function () {
+            const keyword = this.value.toLowerCase();
+            const filtered = allProducts.filter(p =>
+                (p.name && p.name.toLowerCase().includes(keyword)) ||
+                (p.category && p.category.toLowerCase().includes(keyword))
+            );
+            renderProductTable(filtered);
+        });
+    });
+
+    function renderProductTable(products) {
+        const tableBody = document.getElementById('productTableBody');
+        tableBody.innerHTML = '';
+
+        if (products.length > 0) {
+            products.forEach((product, index) => {
+                const row = `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${product.name}</td>
+                        <td>${product.category || 'Uncategorized'}</td>
+                        <td>₹${product.price.toFixed(2)}</td>
+                        <td>${product.stockQty}</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+        } else {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center text-muted">No matching products found.</td>
+                </tr>
+            `;
+        }
+    }
+
+    function renderCharts(data) {
+        // Bar Chart
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'bar',
+            data: {
+                labels: data.byCategory.map(c => c.category),
+                datasets: [{
+                    label: 'Products by Category',
+                    data: data.byCategory.map(c => c.count),
+                    backgroundColor: '#4361ee'
+                }]
+            },
+            options: { responsive: true }
+        });
+
+        // Pie Chart
+        const pieData = data.byCategory.map(c => {
+            const productsInCat = data.allProducts.filter(p => p.category === c.category);
+            const total = productsInCat.reduce((sum, p) => sum + p.price, 0);
+            return { label: c.category, total };
+        });
+
+        new Chart(document.getElementById('pricePieChart'), {
+            type: 'pie',
+            data: {
+                labels: pieData.map(p => p.label),
+                datasets: [{
+                    data: pieData.map(p => p.total),
+                    backgroundColor: ['#f44336', '#2196f3', '#ffc107', '#4caf50', '#9c27b0']
+                }]
+            }
+        });
+
+        // Line Chart (Dummy Stock Trend)
+        new Chart(document.getElementById('stockLineChart'), {
+            type: 'line',
+            data: {
+                labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5'],
+                datasets: [{
+                    label: 'Stock Trend',
+                    data: [50, 80, 70, 100, 90],
+                    borderColor: '#28a745',
+                    tension: 0.3,
+                    fill: false
+                }]
+            }
+        });
+    }
+</script>

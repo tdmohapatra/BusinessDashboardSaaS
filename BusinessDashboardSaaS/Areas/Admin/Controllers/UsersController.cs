@@ -18,16 +18,36 @@ namespace BusinessDashboardSaaS.Areas.Admin.Controllers
             _roleManager = roleManager;
         }
 
-        public IActionResult Index()
+        // ✅ LIST USERS
+        public async Task<IActionResult> Index()
         {
             var users = _userManager.Users.ToList();
-            return View(users);
+            var model = new List<EditUserViewModel>();
+
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+
+                model.Add(new EditUserViewModel
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    UserName = user.UserName,
+                    EmailConfirmed = user.EmailConfirmed,
+                    SelectedRoles = roles.ToList()
+                });
+            }
+
+            return View(model);
         }
 
-        // 🛠️ EDIT USER INFO
+
+        // ✅ EDIT USER
         [HttpGet]
         public async Task<IActionResult> Edit(string id)
         {
+            if (string.IsNullOrEmpty(id)) return NotFound();
+
             var user = await _userManager.FindByIdAsync(id);
             if (user == null) return NotFound();
 
@@ -39,6 +59,7 @@ namespace BusinessDashboardSaaS.Areas.Admin.Controllers
                 Id = user.Id,
                 Email = user.Email,
                 UserName = user.UserName,
+                EmailConfirmed = user.EmailConfirmed,
                 AllRoles = roles,
                 SelectedRoles = userRoles.ToList()
             };
@@ -54,32 +75,28 @@ namespace BusinessDashboardSaaS.Areas.Admin.Controllers
 
             user.Email = model.Email;
             user.UserName = model.UserName;
+
             var updateResult = await _userManager.UpdateAsync(user);
-
-            if (updateResult.Succeeded)
+            if (!updateResult.Succeeded)
             {
-                var currentRoles = await _userManager.GetRolesAsync(user);
-                var rolesToAdd = model.SelectedRoles.Except(currentRoles);
-                var rolesToRemove = currentRoles.Except(model.SelectedRoles);
+                foreach (var error in updateResult.Errors)
+                    ModelState.AddModelError("", error.Description);
 
-                await _userManager.RemoveFromRolesAsync(user, rolesToRemove);
-                await _userManager.AddToRolesAsync(user, rolesToAdd);
-
-                ViewBag.Message = "User updated successfully.";
-                //return RedirectToAction("Index");
-                return RedirectToAction("Index", new { success = true });
-
+                model.AllRoles = _roleManager.Roles.Select(r => r.Name).ToList();
+                return View(model);
             }
 
-            foreach (var error in updateResult.Errors)
-                ModelState.AddModelError("", error.Description);
+            var currentRoles = await _userManager.GetRolesAsync(user);
+            var rolesToAdd = model.SelectedRoles.Except(currentRoles);
+            var rolesToRemove = currentRoles.Except(model.SelectedRoles);
 
-            model.AllRoles = _roleManager.Roles.Select(r => r.Name).ToList();
-            return View(model);
+            await _userManager.RemoveFromRolesAsync(user, rolesToRemove);
+            await _userManager.AddToRolesAsync(user, rolesToAdd);
+
+            return RedirectToAction("Index", new { success = true });
         }
 
-
-        // 🔐 EDIT USER ROLES
+        // ✅ EDIT ROLES ONLY
         [HttpGet]
         public async Task<IActionResult> EditRoles(string id)
         {
@@ -97,6 +114,7 @@ namespace BusinessDashboardSaaS.Areas.Admin.Controllers
 
             ViewBag.UserId = user.Id;
             ViewBag.Email = user.Email;
+
             return View(model);
         }
 
@@ -107,17 +125,15 @@ namespace BusinessDashboardSaaS.Areas.Admin.Controllers
             if (user == null) return NotFound();
 
             var currentRoles = await _userManager.GetRolesAsync(user);
-            var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+            await _userManager.RemoveFromRolesAsync(user, currentRoles);
 
             var rolesToAdd = model.Where(r => r.IsAssigned).Select(r => r.RoleName);
-            var addResult = await _userManager.AddToRolesAsync(user, rolesToAdd);
+            await _userManager.AddToRolesAsync(user, rolesToAdd);
 
-            //            return RedirectToAction("Index");
             return RedirectToAction("Index", new { success = true });
-
         }
 
-        // 🗑️ DELETE USER
+        // ✅ DELETE USER
         [HttpGet]
         public async Task<IActionResult> Delete(string id)
         {
@@ -135,7 +151,7 @@ namespace BusinessDashboardSaaS.Areas.Admin.Controllers
 
             var result = await _userManager.DeleteAsync(user);
             if (result.Succeeded)
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", new { success = true });
 
             foreach (var error in result.Errors)
                 ModelState.AddModelError("", error.Description);
@@ -143,23 +159,4 @@ namespace BusinessDashboardSaaS.Areas.Admin.Controllers
             return View(user);
         }
     }
-
-    // ViewModels
-
-    public class RoleViewModel
-    {
-        public string RoleName { get; set; }
-        public bool IsAssigned { get; set; }
-    }
-
-    public class EditUserViewModel
-    {
-        public string Id { get; set; }
-        public string Email { get; set; }
-        public string UserName { get; set; }
-
-        public List<string> AllRoles { get; set; } = new();
-        public List<string> SelectedRoles { get; set; } = new();
-    }
-
 }

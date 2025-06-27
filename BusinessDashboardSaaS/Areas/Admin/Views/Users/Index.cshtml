@@ -1,7 +1,5 @@
-﻿@* ✅ Full User Management Page with Modal & Toasts *@
-@using Microsoft.AspNetCore.Identity
-@model IEnumerable<IdentityUser>
-@inject UserManager<IdentityUser> UserManager
+﻿@using Microsoft.AspNetCore.Identity
+@model IEnumerable<BusinessDashboardSaaS.Models.Admin.EditUserViewModel>
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -10,99 +8,193 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
-<h2 class="mb-4">👥 Manage Users</h2>
+<style>
+    h2 {
+        font-weight: 700;
+        color: #2b2d42;
+    }
 
-<div class="mb-3 text-end">
-    <a href="/Identity/Account/Register" class="btn btn-success">
-        <i class="bi bi-person-plus-fill"></i> Create New User
-    </a>
-</div>
+    .btn-success {
+        background-color: #198754;
+        border: none;
+    }
 
-<div class="table-responsive">
-    <table class="table table-bordered table-striped align-middle">
-        <thead class="table-dark">
-            <tr>
-                <th>#</th>
-                <th>Email</th>
-                <th>User Name</th>
-                <th>Status</th>
-                <th>Roles</th>
-                <th style="width: 180px;">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model.Any())
-            {
-                var index = 1;
-                foreach (var user in Model)
-                {
-                    var roles = await UserManager.GetRolesAsync(user);
+        .btn-success:hover {
+            background-color: #157347;
+        }
+
+    .btn-primary {
+        background-color: #4361ee;
+        border: none;
+    }
+
+        .btn-primary:hover {
+            background-color: #364fc7;
+        }
+
+    .btn-warning {
+        background-color: #ffc107;
+        border: none;
+    }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+
+    .btn-danger {
+        background-color: #ef233c;
+        border: none;
+    }
+
+        .btn-danger:hover {
+            background-color: #c30723;
+        }
+
+    .table {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+        .table thead th {
+            background-color: #343a40;
+            color: white;
+        }
+
+    .badge {
+        font-size: 0.8rem;
+    }
+
+    .toast-container {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1055;
+    }
+</style>
+
+<div class="container mt-4">
+    <h2 class="mb-4"><i class="bi bi-people-fill"></i> Manage Users</h2>
+
+    <div class="mb-3 text-end">
+        <a href="/Identity/Account/Register" class="btn btn-success">
+            <i class="bi bi-person-plus-fill"></i> Create New User
+        </a>
+    </div>
+
+    <div class="card p-3">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead>
                     <tr>
-                        <td>@index</td>
-                        <td>@user.Email</td>
-                        <td>@user.UserName</td>
-                        <td>
-                            @if (user.EmailConfirmed)
-                            {
-                                <span class="badge bg-success">Confirmed</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">Pending</span>
-                            }
-                        </td>
-                        <td>
-                            @foreach (var role in roles)
-                            {
-                                <span class="badge bg-info text-dark me-1">@role</span>
-                            }
-                        </td>
-                        <td>
-                            <div class="btn-group">
-                                <a asp-area="Admin" asp-controller="Users" asp-action="Edit" asp-route-id="@user.Id" class="btn btn-sm btn-warning" title="Edit">
-                                    <i class="bi bi-pencil-square"></i>
-                                </a>
-                                <a asp-area="Admin" asp-controller="Users" asp-action="EditRoles" asp-route-id="@user.Id" class="btn btn-sm btn-primary" title="Edit Roles">
-                                    <i class="bi bi-shield-lock"></i>
-                                </a>
-                                <button class="btn btn-sm btn-danger" title="Delete"
-                                        onclick="handleDelete('@user.Id', '@user.UserName')">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </div>
-                        </td>
+                        <th>#</th>
+                        <th>Email</th>
+                        <th>User Name</th>
+                        <th>Status</th>
+                        <th>Roles</th>
+                        <th style="width: 180px;">Actions</th>
                     </tr>
-                    index++;
-                }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="6" class="text-center text-muted">No users found.</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        var index = 1;
+                        foreach (var user in Model)
+                        {
+                            <tr>
+                                <td>@index</td>
+                                <td>@user.Email</td>
+                                <td>@user.UserName</td>
+                                <td>
+                                    @if (user.EmailConfirmed)
+                                    {
+                                        <span class="badge bg-success">Confirmed</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Pending</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (user.SelectedRoles != null && user.SelectedRoles.Any())
+                                    {
+                                        foreach (var role in user.SelectedRoles)
+                                        {
+                                            <span class="badge bg-info text-dark me-1">@role</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark">No Roles</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="~/Admin/Users/Edit/@user.Id" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-pencil-square"></i> Edit
+                                        </a>
+                                        <a href="~/Admin/Users/EditRoles/@user.Id" class="btn btn-sm btn-warning">
+                                            <i class="bi bi-shield-lock"></i> Roles
+                                        </a>
+                                        <a href="~/Admin/Users/Delete/@user.Id" class="btn btn-sm btn-danger"
+                                           onclick="return confirm('Are you sure you want to delete @user.UserName?');">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </a>
+                                    </div>
+                                </td>
+
+                     @*            <td>
+                                    <div class="btn-group">
+                                        <a asp-controller="Users" asp-action="Edit" asp-route-id="@user.Id" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-pencil-square"></i> Edit
+                                        </a>
+                                        <a asp-controller="Users" asp-action="EditRoles" asp-route-id="@user.Id" class="btn btn-sm btn-warning">
+                                            <i class="bi bi-shield-lock"></i> Roles
+                                        </a>
+                                        <a asp-controller="Users" asp-action="Delete" asp-route-id="@user.Id"
+                                           class="btn btn-sm btn-danger"
+                                           onclick="return confirm('Are you sure you want to delete @user.UserName?');">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </a>
+                                    </div>
+                                </td> *@
+
+                            </tr>
+                            index++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No users found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
-<partial name="_ToastModalPartial" />
+<!-- Toast Notification -->
+<div class="toast-container">
+    <div id="toast" class="toast align-items-center text-white bg-success border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi bi-check-circle me-2"></i> Action completed successfully.
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        function handleDelete(userId, userName) {
-            showModal(
-                "Delete User",
-                `Are you sure you want to delete <strong>${userName}</strong>?`,
-                "Delete",
-                function () {
-                    window.location.href = `/Admin/Users/Delete/${userId}`;
-                }
-            );
-        }
+        const toast = new bootstrap.Toast(document.getElementById('toast'));
 
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get("success")) {
-            showToast("Action completed successfully.");
+            toast.show();
         }
     </script>
 }

@@ -1,31 +1,165 @@
-﻿@model List<BusinessDashboardSaaS.Areas.Admin.Controllers.RoleViewModel>
+﻿@model List<BusinessDashboardSaaS.Models.Admin.RoleViewModel>
+
 @{
-    ViewData["Title"] = "Edit User Roles";
+    ViewData["Title"] = "Edit Roles";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Edit Roles for @ViewBag.Email</h2>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
-<form asp-action="EditRoles" asp-route-id="@ViewBag.UserId" method="post">
-    <table class="table table-bordered">
-        <thead class="table-light">
-            <tr>
-                <th>Role</th>
-                <th>Assigned</th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (int i = 0; i < Model.Count; i++)
-            {
-                <tr>
-                    <td>@Model[i].RoleName</td>
-                    <td>
-                        <input type="checkbox" asp-for="@Model[i].IsAssigned" class="form-check-input" />
-                        <input type="hidden" asp-for="@Model[i].RoleName" />
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-    <button type="submit" class="btn btn-success">Save Changes</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-</form>
+<style>
+    body {
+        background-color: #edf2f7;
+    }
+
+    .card {
+        border-radius: 18px;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+        border: none;
+        background: white;
+        animation: fadeInUp 0.7s ease;
+        max-width: 900px;
+        margin: auto;
+    }
+
+    .card-header {
+        border-radius: 18px 18px 0 0;
+        background: linear-gradient(90deg, #4361ee, #5f78f4);
+        color: white;
+        padding: 1.5rem;
+    }
+
+    h4 {
+        font-weight: 700;
+        font-size: 1.9rem;
+    }
+
+    .btn-success {
+        background-color: #2f9e44;
+        border: none;
+    }
+
+        .btn-success:hover {
+            background-color: #228c3c;
+        }
+
+    .btn-secondary {
+        background-color: #adb5bd;
+        border: none;
+    }
+
+        .btn-secondary:hover {
+            background-color: #868e96;
+        }
+
+    .form-label {
+        font-weight: 600;
+        color: #212529;
+        font-size: 1.05rem;
+    }
+
+    .roles-box {
+        background-color: #f8f9fa;
+        padding: 1.3rem;
+        border-radius: 14px;
+        border: 1px solid #dee2e6;
+    }
+
+    .form-check-input:checked {
+        background-color: #4361ee;
+        border-color: #4361ee;
+    }
+
+    .form-check-label {
+        cursor: pointer;
+    }
+
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .d-flex {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .btn {
+        padding: 0.65rem 2rem;
+        font-size: 1.05rem;
+        border-radius: 12px;
+    }
+
+    @@media (max-width: 576px) {
+        .card
+
+    {
+        padding: 1rem;
+    }
+
+    .card-header {
+        text-align: center;
+    }
+
+    .d-flex {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="container py-5">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="mb-0">
+                <i class="bi bi-shield-lock-fill me-2"></i> Edit Roles for
+                <span class="fw-bold">@ViewBag.Email</span>
+            </h4>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="EditRoles" asp-route-id="@ViewBag.UserId" method="post">
+                <div class="mb-3">
+                    <label class="form-label">Assign Roles</label>
+                    <div class="roles-box">
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox"
+                                       name="[@i].IsAssigned"
+                                       value="true"
+                                       @(Model[i].IsAssigned ? "checked" : "") />
+                                <input type="hidden" name="[@i].RoleName" value="@Model[i].RoleName" />
+                                <label class="form-check-label">
+                                    <i class="bi bi-shield-check me-1"></i> @Model[i].RoleName
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-save me-1"></i> Save Roles
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left-circle me-1"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
