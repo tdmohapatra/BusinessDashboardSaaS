@@ -181,6 +181,12 @@
             @if (User.IsInRole("Admin"))
             {
                 <div class="px-3 py-2 text-uppercase small text-muted menu-text">Administration</div>
+                     
+                <a href="/Product/index" class="menu-item">
+                    <i class="bi bi-people"></i>
+                    <span class="menu-text">Product Details</span>
+                </a>
+                
                 
                 <a href="/Admin/Users" class="menu-item">
                     <i class="bi bi-people"></i>
@@ -200,12 +206,17 @@
                 <span class="menu-text">Profile</span>
             </a>
             
-            <form method="post" action="/Identity/Account/Logout" class="menu-item">
+      @*       <form method="post" action="/Identity/Account/Logout" class="menu-item">
                 <button type="submit" class="bg-transparent border-0 text-start w-100 p-0 text-inherit d-flex align-items-center">
                     <i class="bi bi-box-arrow-right"></i>
                     <span class="menu-text">Logout</span>
                 </button>
-            </form>
+            </form> *@
+
+                <a href="/Identity/Account/Logout" class="menu-item">
+                <i class="bi bi-box-arrow-right"></i>
+                <span class="menu-text">Logout</span>
+            </a>
         </div>
     </div>
     

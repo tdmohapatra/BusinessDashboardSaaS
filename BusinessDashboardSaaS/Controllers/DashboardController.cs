@@ -7,7 +7,7 @@ namespace BusinessDashboardSaaS.Controllers
 
 
     //[Authorize]
-    [Authorize(Roles = "Admin")]
+  //  [Authorize(Roles = "Admin")]
     public class DashboardController : Controller
     {
         private readonly IProductRepository _repo;

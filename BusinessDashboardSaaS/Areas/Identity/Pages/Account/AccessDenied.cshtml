@@ -1,10 +1,111 @@
 ﻿@page
 @model AccessDeniedModel
 @{
-    ViewData["Title"] = "Access denied";
+    ViewData["Title"] = "Access Denied";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<header>
-    <h1 class="text-danger">@ViewData["Title"]</h1>
-    <p class="text-danger">You do not have access to this resource.</p>
-</header>
+<style>
+    :root {
+        --primary-color: #4361ee;
+        --primary-dark: #3a56d4;
+        --secondary-color: #3f37c9;
+        --text-color: #2b2d42;
+        --light-color: #f8f9fa;
+        --danger-color: #ef233c;
+    }
+
+    .access-denied-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--light-color);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .access-denied-container {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 500px;
+        margin: 2rem auto;
+        padding: 2.5rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        animation: fadeInUp 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+        .access-denied-container h1 {
+            font-size: 2rem;
+            color: var(--danger-color);
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+        }
+
+        .access-denied-container p {
+            color: #6c757d;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+    .btn-back-home {
+        background-color: var(--primary-color);
+        border: none;
+        height: 48px;
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 0 1.5rem;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+        .btn-back-home:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+
+    /* Animation */
+    @@keyframes fadeInUp {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    /* Responsive */
+    @@media (max-width: 576px) {
+        .access-denied-container
+
+    {
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+
+    .access-denied-container h1 {
+        font-size: 1.6rem;
+    }
+
+    }
+</style>
+
+<div class="access-denied-page">
+    <div class="access-denied-container">
+        <h1>Access Denied</h1>
+        <p>You do not have permission to access this resource.<br>Please contact the administrator if you believe this is an error.</p>
+
+        <a href="/" class="btn btn-back-home">Back to Home</a>
+    </div>
+</div>
