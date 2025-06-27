@@ -1,0 +1,31 @@
+﻿@model List<BusinessDashboardSaaS.Areas.Admin.Controllers.RoleViewModel>
+@{
+    ViewData["Title"] = "Edit User Roles";
+}
+
+<h2>Edit Roles for @ViewBag.Email</h2>
+
+<form asp-action="EditRoles" asp-route-id="@ViewBag.UserId" method="post">
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Role</th>
+                <th>Assigned</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                <tr>
+                    <td>@Model[i].RoleName</td>
+                    <td>
+                        <input type="checkbox" asp-for="@Model[i].IsAssigned" class="form-check-input" />
+                        <input type="hidden" asp-for="@Model[i].RoleName" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-success">Save Changes</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

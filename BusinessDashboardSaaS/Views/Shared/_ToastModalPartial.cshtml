@@ -1,0 +1,51 @@
+﻿<!-- 🔔 Toast Notification -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+    <div id="toastSuccess" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toastMessage">Success</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<!-- ❗ Modal Confirmation -->
+<div class="modal fade" id="customConfirmModal" tabindex="-1" aria-labelledby="customConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="customConfirmModalLabel">Confirm Action</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="customConfirmModalBody">Are you sure?</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button id="customConfirmBtn" type="button" class="btn btn-danger">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showModal(title, message, confirmBtnText, onConfirmCallback) {
+        document.getElementById('customConfirmModalLabel').textContent = title;
+        document.getElementById('customConfirmModalBody').innerHTML = message;
+        const confirmBtn = document.getElementById('customConfirmBtn');
+
+        const newBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+        newBtn.textContent = confirmBtnText;
+
+        newBtn.addEventListener("click", function () {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('customConfirmModal'));
+            modal.hide();
+            onConfirmCallback();
+        });
+
+        new bootstrap.Modal(document.getElementById('customConfirmModal')).show();
+    }
+
+    function showToast(message) {
+        document.getElementById('toastMessage').textContent = message;
+        new bootstrap.Toast(document.getElementById('toastSuccess')).show();
+    }
+</script>

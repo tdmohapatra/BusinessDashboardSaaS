@@ -1,0 +1,195 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Business Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --dark-color: #1f1f1f;
+            --light-color: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--light-color);
+        }
+
+        header.hero {
+            background: url('/images/dashboard-banner.jpg') center/cover no-repeat;
+            height: 100vh;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+
+            header.hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+            }
+
+            header.hero .content {
+                position: relative;
+                z-index: 2;
+            }
+
+        .features-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .feature-box:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transition: 0.3s;
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- 🔝 Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Smart Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link active" href="#features">Features</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#modules">Modules</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link btn btn-primary text-white" href="/Identity/Account/Login">Login</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 🏠 Hero Section -->
+    <header class="hero">
+        <div class="content">
+            <h1 class="display-4 fw-bold">Welcome to Smart Business Dashboard</h1>
+            <p class="lead">Track. Analyze. Grow. Your entire business on one platform.</p>
+            <a href="/Identity/Account/Register" class="btn btn-lg btn-light mt-3">Get Started</a>
+        </div>
+    </header>
+
+    <!-- 💡 Features Section -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Why Choose Us</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="p-4 border rounded shadow-sm text-center feature-box">
+                        <div class="features-icon mb-2">📈</div>
+                        <h5>Real-time Analytics</h5>
+                        <p>Monitor product and stock stats live with intelligent insights.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4 border rounded shadow-sm text-center feature-box">
+                        <div class="features-icon mb-2">🔒</div>
+                        <h5>Role-Based Access</h5>
+                        <p>Secure modules with Admin, Manager, and User access control.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4 border rounded shadow-sm text-center feature-box">
+                        <div class="features-icon mb-2">📊</div>
+                        <h5>Powerful Reporting</h5>
+                        <p>Visualize data with dynamic charts and downloadable reports.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 🧩 Modules Section -->
+    <section id="modules" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5">Explore Modules</h2>
+            <div class="row text-center g-4">
+                <div class="col-md-3">
+                    <div class="p-4 bg-white shadow rounded">
+                        <div class="fs-1">📦</div>
+                        <h5>Product Management</h5>
+                        <p>Create, edit, stock and categorize your items.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-4 bg-white shadow rounded">
+                        <div class="fs-1">📋</div>
+                        <h5>Reports</h5>
+                        <p>Daily, Monthly & Category-wise summaries.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-4 bg-white shadow rounded">
+                        <div class="fs-1">👥</div>
+                        <h5>User Management</h5>
+                        <p>Admins can manage user accounts and roles.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-4 bg-white shadow rounded">
+                        <div class="fs-1">📬</div>
+                        <h5>Notifications</h5>
+                        <p>Email alerts, low-stock warnings and system logs.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 📞 Contact Section -->
+    <section id="contact" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-4">Get In Touch</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <form>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" placeholder="Your Name">
+                        </div>
+                        <div class="mb-3">
+                            <input type="email" class="form-control" placeholder="Email Address">
+                        </div>
+                        <div class="mb-3">
+                            <textarea class="form-control" rows="4" placeholder="Message"></textarea>
+                        </div>
+                        <button class="btn btn-primary">Send Message</button>
+                    </form>
+                </div>
+                <div class="col-md-6">
+                    <h5>Address</h5>
+                    <p>123 Business Street, Tech City</p>
+                    <h5>Email</h5>
+                    <p>support@smartdashboard.com</p>
+                    <h5>Phone</h5>
+                    <p>+91-9876543210</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 🧱 Footer -->
+    <footer class="text-center py-4">
+        <p>&copy; 2025 Smart Business Dashboard. All rights reserved.</p>
+    </footer>
+</body>
+</html>

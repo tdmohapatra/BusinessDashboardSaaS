@@ -1,0 +1,120 @@
+﻿@model IEnumerable<Product>
+@{
+    ViewData["Title"] = "Products";
+}
+
+<h2 class="mb-3">Product List</h2>
+
+<!-- Add Button -->
+<button class="btn btn-primary mb-3" onclick="openAddModal()">Add Product</button>
+
+<!-- Table -->
+<table class="table table-bordered table-striped" id="productTable">
+    <thead class="table-dark">
+        <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Category</td>
+                <td>@item.Price</td>
+                <td>@item.StockQty</td>
+                <td>
+                    <button class="btn btn-sm btn-warning" onclick="editProduct(@item.ProductId)">Edit</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteProduct(@item.ProductId)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="productForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productModalLabel">Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="ProductId" name="ProductId" />
+                    <div class="mb-2">
+                        <label>Name</label>
+                        <input type="text" class="form-control" id="Name" name="Name" required />
+                    </div>
+                    <div class="mb-2">
+                        <label>Category</label>
+                        <input type="text" class="form-control" id="Category" name="Category" />
+                    </div>
+                    <div class="mb-2">
+                        <label>Price</label>
+                        <input type="number" step="0.01" class="form-control" id="Price" name="Price" required />
+                    </div>
+                    <div class="mb-2">
+                        <label>StockQty</label>
+                        <input type="number" class="form-control" id="StockQty" name="StockQty" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openAddModal() {
+            $('#productForm')[0].reset();
+            $('#ProductId').val(0);
+            $('#productModal').modal('show');
+        }
+
+        function editProduct(id) {
+            $.get('/Product/GetById?id=' + id, function (data) {
+                $('#ProductId').val(data.productId);
+                $('#Name').val(data.name);
+                $('#Category').val(data.category);
+                $('#Price').val(data.price);
+                $('#StockQty').val(data.stockQty);
+                $('#productModal').modal('show');
+            });
+        }
+
+        function deleteProduct(id) {
+            if (confirm("Are you sure to delete?")) {
+                $.post('/Product/Delete', { id: id }, function (res) {
+                    if (res.success) {
+                        location.reload();
+                    } else {
+                        alert("Delete failed");
+                    }
+                });
+            }
+        }
+
+        $('#productForm').submit(function (e) {
+            e.preventDefault();
+            var formData = $(this).serialize();
+            $.post('/Product/Save', formData, function (res) {
+                if (res.success) {
+                    $('#productModal').modal('hide');
+                    location.reload();
+                } else {
+                    alert("Save failed");
+                }
+            });
+        });
+    </script>
+}
